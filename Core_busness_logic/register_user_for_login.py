@@ -13,6 +13,7 @@ try:
     # Prefer importing the local Databases package when running from the POS_SYSTEM folder
     from Databases.database_connection import get_db_connection, INVENTORY_DB, SALES_DB, DEBTS_DB, OTHER_PAYMENTS_DB
     from import_currency_symbols import get_currency_symbol
+    from valid_email import get_valid_email
 except Exception:
     # Fallback to absolute package import when running as an installed package or different import context
     from POS_SYSTEM.Databases.database_connection import get_db_connection, INVENTORY_DB, SALES_DB, DEBTS_DB, OTHER_PAYMENTS_DB
@@ -157,6 +158,8 @@ def generate_username(first_name, last_name, store_id):
     finally:
         conn.close()
 
+
+
 # Main registration function only for BOSS user and other users will be added later by the BOSS
 def register_user():
     """
@@ -169,7 +172,14 @@ def register_user():
     middle_name = sanitize_input(input("Enter middle name (optional): ").strip()) or None
     last_name = sanitize_input(input("Enter last name: ").strip())
     whatsapp_number = input("Enter WhatsApp number (e.g., +255743114080, press Enter to skip): ").strip()
+    user_email = get_valid_email()
     
+    if user_email:
+        print(f"\n✓ Final email saved: {user_email}")
+    else:
+        print("\n✓ No email saved (user skipped)")
+    
+    address = sanitize_input(input("Enter address (optional): ").strip()) or None
     # The store location is optional and can be set to None
     store_location = sanitize_input(input("Enter store location (optional): ").strip()) or None
 
@@ -233,13 +243,61 @@ def register_user():
         # Generate store code
         store_code = generate_store_code()
         country = input(f"Enter country located for store: {store_code}: ").strip()
+
+        business_types = [
+            "Retail",
+            "Wholesale",
+            "Restaurant",
+            "Pharmacy",
+            "Services",
+            "Manufacturing"
+        ]
+
+        while True:
+            print("\nSelect your business type:")
+            for i, bt in enumerate(business_types, start=1):
+                print(f"{i}. {bt}")
+            print(f"{len(business_types) + 1}. Other")
+
+            choice = input(
+                f"Enter a number (1 - {len(business_types) + 1}): "
+            ).strip()
+
+            # Validate numeric input
+            if not choice.isdigit():
+                print("Please enter a valid number.")
+                continue
+
+            choice = int(choice)
+
+            # Known business types
+            if 1 <= choice <= len(business_types):
+                business_type = business_types[choice - 1]
+                break
+
+            # Other (custom business type)
+            elif choice == len(business_types) + 1:
+                business_type = input(
+                    "Enter your business type: "
+                ).strip()
+
+                if business_type == "":
+                    print(" Business type cannot be empty.")
+                    continue
+                break
+
+            else:
+                print(" Invalid choice. Please try again.")
+
+
+
         symbol,currency_code  = get_currency_symbol(country)
         # Create store
         store_data = {
             'store_code': store_code,
             'name': store_name,
             'location': store_location,
-            'business_type': 'retail',
+            'business_type': business_type,
             'owner_id': None,  # Will be updated after user creation
             'has_boss': 1,
             'password': hash_password(store_password),
@@ -299,6 +357,8 @@ def register_user():
             'last_name': last_name,
             'password': hash_password(user_password),
             'role': 'boss',
+            'email': user_email,
+            'address': address,
             'created_at': datetime.now().isoformat(),
             'current_store_id': store_id,
             'current_store_code': store_code,
@@ -307,9 +367,9 @@ def register_user():
         }
         
         cursor = conn.execute("""
-            INSERT INTO users (username, first_name, middle_name, last_name, password, role, created_at, 
+            INSERT INTO users (username, first_name, middle_name, last_name, password, role, email, address, created_at,
                              current_store_id, current_store_code, whatsapp_number, synced)
-            VALUES (:username, :first_name, :middle_name, :last_name, :password, :role, :created_at,
+            VALUES (:username, :first_name, :middle_name, :last_name, :password, :role, :email, :address, :created_at,
                    :current_store_id, :current_store_code, :whatsapp_number, :synced)
         """, user_data)
         user_id = cursor.lastrowid
