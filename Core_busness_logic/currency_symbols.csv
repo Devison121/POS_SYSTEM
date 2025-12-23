@@ -1,0 +1,195 @@
+country,currency_code,symbol
+Afghanistan,AFN,؋
+Albania,ALL,L
+Algeria,DZD,دج
+Andorra,EUR,€
+Angola,AOA,Kz
+Antigua and Barbuda,XCD,$
+Argentina,ARS,$
+Armenia,AMD,֏
+Australia,AUD,$
+Austria,EUR,€
+Azerbaijan,AZN,₼
+Bahamas,BSD,$
+Bahrain,BHD,.د.ب
+Bangladesh,BDT,৳
+Barbados,BBD,$
+Belarus,BYN,Br
+Belgium,EUR,€
+Belize,BZD,BZ$
+Benin,XOF,CFA
+Bhutan,BTN,Nu.
+Bolivia,BOB,Bs.
+Bosnia and Herzegovina,BAM,КМ
+Botswana,BWP,P
+Brazil,BRL,R$
+Brunei,BND,$
+Bulgaria,BGN,лв
+Burkina Faso,XOF,CFA
+Burundi,BIF,FBu
+Cambodia,KHR,៛
+Cameroon,XAF,FCFA
+Canada,CAD,$
+Cape Verde,CVE,$
+Central African Republic,XAF,FCFA
+Chad,XAF,FCFA
+Chile,CLP,$
+China,CNY,¥ / 元
+Colombia,COP,$
+Comoros,KMF,CF
+Congo, Republic of the,XAF,FCFA
+Congo, Democratic Republic of,CDF,FC
+Costa Rica,CRC,₡
+Côte d’Ivoire,XOF,CFA
+Croatia,EUR,€
+Cuba,CUP,$
+Cyprus,EUR,€
+Czech Republic,CZK,Kč
+Denmark,DKK,kr
+Djibouti,DJF,Fdj
+Dominica,XCD,$
+Dominican Republic,DOP,RD$
+Ecuador,USD,$
+Egypt,EGP,£ / ج.م
+El Salvador,USD,$
+Equatorial Guinea,XAF,FCFA
+Eritrea,ERN,Nfk
+Estonia,EUR,€
+Eswatini (Swaziland),SZL,E
+Ethiopia,ETB,Br
+Fiji,FJD,$
+Finland,EUR,€
+France,EUR,€
+Gabon,XAF,FCFA
+Gambia,GMD,D
+Georgia,GEL,₾
+Germany,EUR,€
+Ghana,GHS,₵
+Greece,EUR,€
+Grenada,XCD,$
+Guatemala,GTQ,Q
+Guinea,GNF,FG
+Guinea-Bissau,XOF,CFA
+Guyana,GYD,$
+Haiti,HTG,G
+Honduras,HNL,L
+Hungary,HUF,Ft
+Iceland,ISK,kr
+India,INR,₹
+Indonesia,IDR,Rp
+Iran,IRR,﷼
+Iraq,IQD,ع.د
+Ireland,EUR,€
+Israel,ILS,₪
+Italy,EUR,€
+Jamaica,JMD,J$
+Japan,JPY,¥
+Jordan,JOD,د.ا
+Kazakhstan,KZT,₸
+Kenya,KES,KSh
+Kiribati,AUD,$
+Korea, North,KPW,₩
+Korea, South,KRW,₩
+Kuwait,KWD,د.ك
+Kyrgyzstan,KGS,с
+Laos,LAK,₭
+Latvia,EUR,€
+Lebanon,LBP,ل.ل
+Lesotho,LSL,M
+Liberia,LRD,$
+Libya,LYD,ل.د
+Liechtenstein,CHF,CHF / Fr.
+Lithuania,EUR,€
+Luxembourg,EUR,€
+Madagascar,MGA,Ar
+Malawi,MWK,MK
+Malaysia,MYR,RM
+Maldives,MVR,ރ.
+Mali,XOF,CFA
+Malta,EUR,€
+Marshall Islands,USD,$
+Mauritania,MRU,UM
+Mauritius,MUR,₨
+Mexico,MXN,$
+Micronesia,USD,$
+Moldova,MDL,L
+Monaco,EUR,€
+Mongolia,MNT,₮
+Montenegro,EUR,€
+Morocco,MAD,د.م.
+Mozambique,MZN,MT
+Myanmar,MMK,K
+Namibia,NAD,$
+Nauru,AUD,$
+Nepal,NPR,₨
+Netherlands,EUR,€
+New Zealand,NZD,$
+Nicaragua,NIO,C$
+Niger,XOF,CFA
+Nigeria,NGN,₦
+North Macedonia,MKD,ден
+Norway,NOK,kr
+Oman,OMR,ر.ع.
+Pakistan,PKR,₨
+Palau,USD,$
+Panama,PAB / USD,B/. / $
+Papua New Guinea,PGK,K
+Paraguay,PYG,₲
+Peru,PEN,S/.
+Philippines,PHP,₱
+Poland,PLN,zł
+Portugal,EUR,€
+Qatar,QAR,ر.ق
+Romania,RON,lei
+Russia,RUB,₽
+Rwanda,RWF,RF
+Saint Kitts and Nevis,XCD,$
+Saint Lucia,XCD,$
+Saint Vincent and the Grenadines,XCD,$
+Samoa,WST,T
+San Marino,EUR,€
+Sao Tome and Principe,STN,Db
+Saudi Arabia,SAR,﷼
+Senegal,XOF,CFA
+Serbia,RSD,дин.
+Seychelles,SCR,₨
+Sierra Leone,SLL,Le
+Singapore,SGD,$
+Slovakia,EUR,€
+Slovenia,EUR,€
+Solomon Islands,SBD,$
+Somalia,SOS,Sh
+South Africa,ZAR,R
+South Sudan,SSP,£
+Spain,EUR,€
+Sri Lanka,LKR,Rs
+Sudan,SDG,£
+Suriname,SRD,$
+Sweden,SEK,kr
+Switzerland,CHF,CHF / Fr.
+Syria,SYP,£
+Taiwan,TWD,NT$
+Tajikistan,TJS,ЅМ
+Tanzania,TZS,TSh
+Thailand,THB,฿
+Togo,XOF,CFA
+Tonga,TOP,T$
+Trinidad and Tobago,TTD,$
+Tunisia,TND,د.ت
+Turkey,TRY,₺
+Turkmenistan,TMT,m
+Tuvalu,AUD,$
+Uganda,UGX,USh
+Ukraine,UAH,₴
+United Arab Emirates,AED,د.إ
+United Kingdom,GBP,£
+United States of America,USD,$
+Uruguay,UYU,$U
+Uzbekistan,UZS,so’m
+Vanuatu,VUV,VT
+Vatican City,EUR,€
+Venezuela,VES,Bs.
+Vietnam,VND,₫
+Yemen,YER,﷼
+Zambia,ZMW,ZK
+Zimbabwe,ZWL (plus USD),Z$
