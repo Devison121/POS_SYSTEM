@@ -31,6 +31,4 @@ CREATE TABLE debt_payments (
     FOREIGN KEY (user_id) REFERENCES users(id)
 );
 DELETE FROM sqlite_sequence;
-INSERT INTO sqlite_sequence VALUES('debts',14);
-INSERT INTO sqlite_sequence VALUES('debt_payments',19);
 COMMIT;
