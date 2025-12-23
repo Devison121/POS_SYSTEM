@@ -121,6 +121,7 @@ CREATE TABLE user_commissions (
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             expiry_date DATETIME,
             is_active INTEGER NOT NULL DEFAULT 1,
+            synced BOOLEAN DEFAULT 0,
             FOREIGN KEY (user_id) REFERENCES users(id)
         );
 DELETE FROM sqlite_sequence;
