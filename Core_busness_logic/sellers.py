@@ -164,9 +164,8 @@ def add_user_by_boss(current_user):
         salary_amount = input("Enter salary amount (press Enter to skip): ").strip()
         salary_frequency = frequency_menu()
         salary_amount = float(salary_amount) if salary_amount else 0.0
-        commission_rate = input("Enter commission rate as a percentage (press Enter to skip): ").strip()
-        commission_rate = float(commission_rate) if commission_rate else 0.0
-        
+        commission_amount = input("Enter commission amount (press Enter to skip): ").strip()
+        commission_amount = float(commission_amount) if commission_amount else 0.0
 
         
         commission_frequency = frequency_menu()
@@ -290,6 +289,7 @@ def add_user_by_boss(current_user):
                    :current_store_id, :current_store_code, :created_at, :synced)
         """, user_data)
         user_id = cursor.lastrowid
+        store_code = current_user['current_store_code']
         
         # Create user_store entry
         user_store_data = {
@@ -307,8 +307,9 @@ def add_user_by_boss(current_user):
         # Dictionary ya user_commissions
         user_commission_data = {
             'user_id': user_id,
-            'commission_rate': commission_rate,  
-            'commission_frequency': commission_frequency,  
+            'commission_rate': commission_amount,  
+            'commission_frequency': commission_frequency,
+            'store_code': store_code,  
             'expiry_date': formatted_expiry,  
             'is_active': 1,  # 1 = active, 0 = inactive
             'synced': 0
@@ -316,8 +317,8 @@ def add_user_by_boss(current_user):
 
         # Kuinsert data kwenye user_commissions table
         cursor.execute("""
-            INSERT INTO user_commissions (user_id, commission_rate, commission_frequency, expiry_date, is_active,  synced)
-            VALUES (:user_id, :commission_rate, :commission_frequency, :expiry_date, :is_active, :synced)
+            INSERT INTO user_commissions (user_id, commission_amount, commission_frequency, store_code, expiry_date, is_active,  synced)
+            VALUES (:user_id, :commission_amount, :commission_frequency, :store_code, :expiry_date, :is_active, :synced)
         """, user_commission_data)
 
         # Commit the transaction
