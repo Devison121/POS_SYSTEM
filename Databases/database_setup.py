@@ -150,12 +150,15 @@ def create_inventory_tables():
         CREATE TABLE IF NOT EXISTS user_commissions (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
+            store_code TEXT NOT NULL,
             commission_rate REAL NOT NULL DEFAULT 0.0,
             commission_frequency TEXT CHECK(commission_frequency IN ('one_time', 'daily', 'weekly', 'monthly', 'yearly')) DEFAULT 'monthly',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             expiry_date DATETIME,
             is_active INTEGER NOT NULL DEFAULT 1,
-            FOREIGN KEY (user_id) REFERENCES users(id)
+            synced BOOLEAN DEFAULT 0,
+            FOREIGN KEY (user_id) REFERENCES users(id),
+            FOREIGN KEY (store_code) REFERENCES stores(store_code)
         )
         ''')
         
