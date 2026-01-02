@@ -1,3 +1,5 @@
+# helpers.py
+
 """
 Helper functions for the POS system
 """
@@ -17,3 +19,7 @@ def get_database_path() -> str:
 def get_sales_db_path() -> str:
     """Get the sales database path"""
     return os.path.join(get_database_path(), 'sales.db')
+
+def get_inventory_db_path() -> str:
+    """Get the inventory database path"""
+    return os.path.join(get_database_path(), 'inventory.db')
