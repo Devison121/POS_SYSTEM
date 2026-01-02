@@ -125,6 +125,8 @@ def create_inventory_tables():
             store_code TEXT NOT NULL,
             batch_number TEXT NOT NULL,
             quantity INTEGER NOT NULL,
+            sold_wholesale_qty INTEGER DEFAULT 0, -- For expected margin calculations based on sales type
+            sold_retail_qty INTEGER DEFAULT 0,  -- For expected margin calculations based on sales type
             buying_price REAL NOT NULL,
             shipping_cost REAL DEFAULT 0,
             handling_cost REAL DEFAULT 0,
@@ -151,7 +153,7 @@ def create_inventory_tables():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             store_code TEXT NOT NULL,
-            commission_rate REAL NOT NULL DEFAULT 0.0,
+            commission_amount REAL NOT NULL DEFAULT 0.0,
             commission_frequency TEXT CHECK(commission_frequency IN ('one_time', 'daily', 'weekly', 'monthly', 'yearly')) DEFAULT 'monthly',
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             expiry_date DATETIME,
