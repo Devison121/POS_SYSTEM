@@ -14,6 +14,7 @@ Enhanced Excel Data Import with Sequential Batch System
 
 # make sure you put synced = 0 when updating stock quantities from excel import
 from ask_for_image import ask_excel_file_dialog, ask_image_file_dialog
+from services.cost_calculation_service import CostCalculationService
 from pathlib import Path
 import pandas as pd 
 import sqlite3
@@ -1444,6 +1445,9 @@ class ExcelProcessor:
       
         
         # Validate the dictionary has required fields
+        import pandas as pd
+        product_data_dict_1 = pd.DataFrame([product_data_dict])
+        print(product_data_dict_1)
         if not isinstance(product_data_dict, dict) or 'name' not in product_data_dict or 'stock_quantity' not in product_data_dict:
             print(f"{Colors.RED}❌ Invalid product data format{Colors.RESET}")
             return True  # On error, assume there are changes to be safe
@@ -1458,6 +1462,9 @@ class ExcelProcessor:
             # STEP 1: Fetch existing stock quantities from database
             print(f"{Colors.BLUE}📊 Fetching existing stock data...{Colors.RESET}")
             existing_data = self.fetch_sample_products(limit=None)  # Fetch all products
+            print("++++++++++++++++++++++++++++++++++++++++++++++")
+            existing_data_1 = pd.DataFrame(existing_data)
+            print("Existing Data: ", existing_data_1)
             
             if not existing_data:
                 print(f"{Colors.YELLOW}⚠ No existing products found in database{Colors.RESET}")
@@ -1465,13 +1472,26 @@ class ExcelProcessor:
             
             # Create dictionary of existing stock quantities {product_name: stock_quantity}
             existing_stocks = {}
+            filter_num_to_find = str(product_data_dict['filter_number'])
+
             for row in existing_data:
                 if len(row) >= 3:  # Ensure row has enough columns
                     product_name = row[1]  # NAME is at index 1
-                    stock_quantity = row[2] if row[2] != '' else 0  # STOCK_QUANTITY at index 2
-                    existing_stocks[product_name] = stock_quantity
-                    print(f"{Colors.BLUE}   - {product_name}: {stock_quantity}{Colors.RESET}")
-            
+                    filter_number_in_row = str(row[0])  # BATCH_NUMBER/FILTER at index 0
+                    
+                    print(f"Checking: {product_name} | Filter in row: {filter_number_in_row}")
+                    print(f"Looking for filter: {filter_num_to_find}")
+                    
+                    # Check if this row has the filter number we're looking for
+                    if filter_number_in_row == filter_num_to_find:
+                        print(f"✓ MATCHED: Filter {filter_num_to_find} for {product_name}")
+                        stock_quantity = row[2] if row[2] != '' else 0
+                        existing_stocks[product_name] = stock_quantity
+                        print(f"   Stock Quantity: {stock_quantity}")
+                        break  # Exit loop once we find it
+                    else:
+                        print(f"  Skipped: Filter {filter_number_in_row} != {filter_num_to_find}")
+                        
             print(f"{Colors.GREEN}✓ Found {len(existing_stocks)} existing products{Colors.RESET}")
             
             # STEP 2: Process single product_data_dict
@@ -1487,7 +1507,10 @@ class ExcelProcessor:
             
             if product_name in existing_stocks:
                 existing_qty = existing_stocks[product_name]
+                print(f"{Colors.BLUE}   - Existing quantity: {existing_qty}{Colors.RESET}")
+
                 if existing_qty != new_stock_quantity:
+                    print(f"{existing_qty} != {new_stock_quantity}")
                     print(f"{Colors.YELLOW}🔄 CHANGE DETECTED: {product_name}{Colors.RESET}")
                     print(f"{Colors.YELLOW}   From: {existing_qty} → To: {new_stock_quantity}{Colors.RESET}")
                     changes_detected = True
@@ -1590,9 +1613,25 @@ class ExcelProcessor:
             wholesale_profit = product_data['wholesale_price'] - landed_cost
 
             def calculate_expected_margin():
+                # Create ProductCosts object using the service
+                product_costs = CostCalculationService.calculate_expected_margin(
+                    retail_price=product_data['retail_price'],
+                    wholesale_price=product_data['wholesale_price'],
+                    landed_cost=landed_cost,
+                    product_id=existing_product_id,  # Use actual product ID for ML prediction
+                    is_largest_unit=True
+                )
+                
+                if product_costs:
+                    print(f"{Colors.GREEN}✅ Using actual sales ratios from ML model{Colors.RESET}")
+                    print(f"{Colors.GREEN}   Retail Ratio: {product_costs.retail_ratio:.1%}{Colors.RESET}")
+                    print(f"{Colors.GREEN}   Wholesale Ratio: {product_costs.wholesale_ratio:.1%}{Colors.RESET}")
+                    return product_costs.expected_margin
+                
+                # Fallback to default if service fails
+                print(f"{Colors.YELLOW}⚠ Using default ratios (70/30){Colors.RESET}")
                 retail_ratio, wholesale_ratio = 0.7, 0.3
-                expected_margin = (retail_profit * retail_ratio) + (wholesale_profit * wholesale_ratio)
-                return expected_margin
+                return (retail_profit * retail_ratio) + (wholesale_profit * wholesale_ratio)
             
             expected_margin = calculate_expected_margin()
             original_quantity = self.check_stock_quantity_changes_from_product_data(product_data_dict=product_data)
@@ -1600,7 +1639,7 @@ class ExcelProcessor:
                 batch_query = """
                     UPDATE stock_batches 
                     SET quantity = ?, buying_price = ?, shipping_cost = ?, handling_cost = ?,
-                        expected_margin = ?, total_expected_profit = ?, expiry_date = ?, synced = 0
+                         expiry_date = ?, synced = 0
                     WHERE product_id = ? AND batch_number = ? AND store_id = ?
                 """
                 batch_params = (
@@ -1608,8 +1647,6 @@ class ExcelProcessor:
                     product_data['buying_price'],
                     product_data['shipping_cost'],
                     product_data['handling_cost'],
-                    expected_margin,
-                    expected_margin * product_data['stock_quantity'],
                     product_data['expiry_date'],
                     existing_product_id,
                     product_data['batch_name'],
@@ -1619,7 +1656,7 @@ class ExcelProcessor:
                 batch_query = """
                 UPDATE stock_batches 
                 SET quantity = ?, buying_price = ?, shipping_cost = ?, handling_cost = ?,
-                    expected_margin = ?, total_expected_profit = ?, expiry_date = ?, original_quantity = ?, synced = 0
+                    expected_margin = ?, total_expected_profit = ?, expiry_date = ?, original_quantity = ?, synced = 0, is_active = 1
                 WHERE product_id = ? AND batch_number = ? AND store_id = ?
             """
                 batch_params = (
@@ -1886,7 +1923,32 @@ class ExcelProcessor:
                 print(f"{Colors.RED}❌ CRITICAL: Product ID {product_id} not found in database{Colors.RESET}")
                 return False
             landed_cost = product_data['buying_price'] + product_data['shipping_cost'] + product_data['handling_cost']
-            expected_margin = product_data['retail_price'] - landed_cost
+
+            retail_profit = product_data['retail_price'] - landed_cost
+            wholesale_profit = product_data['wholesale_price'] - landed_cost
+            def calculate_expected_margin():
+                # Create ProductCosts object using the service
+                product_costs = CostCalculationService.calculate_expected_margin(
+                    retail_price=product_data['retail_price'],
+                    wholesale_price=product_data['wholesale_price'],
+                    landed_cost=landed_cost,
+                    product_id=product_id,  # Use actual product ID for ML prediction
+                    is_largest_unit=True
+                )
+                
+                if product_costs:
+                    print(f"{Colors.GREEN}✅ Using actual sales ratios from ML model{Colors.RESET}")
+                    print(f"{Colors.GREEN}   Retail Ratio: {product_costs.retail_ratio:.1%}{Colors.RESET}")
+                    print(f"{Colors.GREEN}   Wholesale Ratio: {product_costs.wholesale_ratio:.1%}{Colors.RESET}")
+                    return product_costs.expected_margin
+                
+                # Fallback to default if service fails
+                print(f"{Colors.YELLOW}⚠ Using default ratios (70/30){Colors.RESET}")
+                retail_ratio, wholesale_ratio = 0.7, 0.3
+                return (retail_profit * retail_ratio) + (wholesale_profit * wholesale_ratio)
+            
+            expected_margin = calculate_expected_margin()
+            
             
             query = """
                 INSERT INTO stock_batches (
