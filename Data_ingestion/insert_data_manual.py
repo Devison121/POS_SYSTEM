@@ -1,3 +1,5 @@
+# insert_data_manual.py
+# Manual data insertion script for POS system
 
 """
 Enhanced Manual Data Insertion Script for POS System
@@ -5,7 +7,7 @@ Standalone script for inserting products into existing stores
 Uses the consolidated inventory.db database structure
 Implements FIFO stock management with comprehensive cost tracking
 """
-# v1.6 - Structured as Professional Big Project
+
 
 
 import os
@@ -523,7 +525,7 @@ class DataInsertionApp:
         # CHECK EXISTING BATCHES
         batches = self.db_manager.execute_query(
             'inventory',
-            """SELECT id, batch_number, quantity, buying_price, expiry_date, is_active
+            """SELECT id, batch_number, quantity, buying_price, expiry_date, is_active, shipping_cost, handling_cost
                FROM stock_batches 
                WHERE product_id = ? 
                ORDER BY received_date ASC""",
@@ -535,7 +537,7 @@ class DataInsertionApp:
         
         if active_batches:
             print(f"\n{Colors.CYAN}📦 EXISTING STOCK BATCHES:{Colors.RESET}")
-            for i, (batch_id, batch_number, quantity, buying_price, expiry_date, is_active) in enumerate(active_batches, 1):
+            for i, (batch_id, batch_number, quantity, buying_price, expiry_date, is_active, shipping_cost, handling_cost) in enumerate(active_batches, 1):
                 expiry_display = expiry_date if expiry_date else "No expiry"
                 status = "ACTIVE" if is_active == 1 else "INACTIVE"
                 print(f"{i}. {batch_number}: {quantity} units - Buying: {buying_price:.2f} - Expiry: {expiry_display} - {status}")
@@ -574,7 +576,7 @@ class DataInsertionApp:
             # 1. KWANZA: CHAGUA BATCH KUFANYIA UPDATE
             batches = self.db_manager.execute_query(
                 'inventory',
-                """SELECT id, batch_number, quantity, buying_price, expiry_date, is_active
+                """SELECT id, batch_number, quantity, buying_price, expiry_date, is_active, shipping_cost, handling_cost
                    FROM stock_batches 
                    WHERE product_id = ? AND is_active = 1
                    ORDER BY received_date ASC""",
@@ -587,7 +589,7 @@ class DataInsertionApp:
                 return
             
             print(f"\n{Colors.CYAN}📦 SELECT BATCH TO UPDATE:{Colors.RESET}")
-            for i, (batch_id, batch_number, batch_quantity, batch_buying_price, batch_expiry, is_active) in enumerate(batches, 1):
+            for i, (batch_id, batch_number, batch_quantity, batch_buying_price, batch_expiry, is_active, shipping_cost, handling_cost) in enumerate(batches, 1):
                 expiry_display = batch_expiry if batch_expiry else "No expiry"
                 print(f"{i}. {batch_number}: {batch_quantity} units - Buying: {batch_buying_price:.2f} - Expiry: {expiry_display}")
             
@@ -596,7 +598,7 @@ class DataInsertionApp:
                 print(f"{Colors.RED}❌ Invalid batch selection{Colors.RESET}")
                 return
             
-            batch_id, batch_number, batch_quantity, batch_buying_price, batch_expiry, is_active = batches[batch_choice - 1]
+            batch_id, batch_number, batch_quantity, batch_buying_price, batch_expiry, is_active, shipping_cost, handling_cost = batches[batch_choice - 1]
             
             # 2. PATA DATA YA CURRENT BATCH NA PRODUCT
             current_data = self.product_service.get_current_product_data(product_id, self.current_store.id)
@@ -700,7 +702,7 @@ class DataInsertionApp:
             margin_data = self.cost_calculation_service.calculate_expected_margin(
                 retail_price=new_retail_price,
                 wholesale_price=new_wholesale_price,
-                landed_cost=new_batch_buying_price,
+                landed_cost=new_batch_buying_price + shipping_cost + handling_cost,
                 product_id=product_id
             )
             
@@ -837,14 +839,14 @@ class DataInsertionApp:
         
         # Select batch to update
         print(f"{Colors.BLUE}Select batch to update:{Colors.RESET}")
-        for i, (batch_id, batch_number, quantity, buying_price, expiry_date, is_active) in enumerate(batches, 1):
+        for i, (batch_id, batch_number, quantity, buying_price, expiry_date, is_active, shipping_cost, handling_cost) in enumerate(batches, 1):
             expiry_display = expiry_date if expiry_date else "No expiry"
             print(f"{i}. {batch_number}: {quantity} units - Buying: {buying_price:.2f} - Expiry: {expiry_display}")
         
         try:
             batch_choice = int(input(f"{Colors.BLUE}Select batch (1-{len(batches)}): {Colors.RESET}").strip())
             if 1 <= batch_choice <= len(batches):
-                batch_id, batch_number, current_quantity, current_buying, current_expiry, is_active = batches[batch_choice - 1]
+                batch_id, batch_number, current_quantity, current_buying, current_expiry, is_active, shipping_cost, handling_cost = batches[batch_choice - 1]
                 
                 print(f"\n{Colors.CYAN}Updating Batch: {batch_number}{Colors.RESET}")
                 print(f"{Colors.CYAN}Current: {current_quantity} units, Buying: {current_buying:.2f}, Expiry: {current_expiry or 'None'}{Colors.RESET}")
@@ -957,7 +959,7 @@ class DataInsertionApp:
                 margin_data = self.cost_calculation_service.calculate_expected_margin(
                     retail_price=new_retail_price,
                     wholesale_price=new_wholesale_price,
-                    landed_cost=new_buying_price,
+                    landed_cost=new_buying_price + shipping_cost + handling_cost,
                     product_id=product_id
                 )
                 
@@ -1056,7 +1058,7 @@ class DataInsertionApp:
             
             # KUULIZA MOJA KWA MOJA: NI BATCH GANI UNATAKA KUTUMIA?
             print(f"{Colors.BLUE}Available batches:{Colors.RESET}")
-            for i, (batch_id, batch_number, quantity, buying_price, expiry_date, is_active) in enumerate(batches, 1):
+            for i, (batch_id, batch_number, quantity, buying_price, expiry_date, is_active, shipping_cost, handling_cost) in enumerate(batches, 1):
                 expiry_display = expiry_date if expiry_date else "No expiry"
                 print(f"{i}. {batch_number}: {quantity} units - Buying: {buying_price:.2f} - Expiry: {expiry_display}")
             
@@ -1065,7 +1067,7 @@ class DataInsertionApp:
                 print(f"{Colors.RED}❌ Invalid batch selection{Colors.RESET}")
                 return
             
-            batch_id, batch_number, current_quantity, current_buying, current_expiry, is_active = batches[batch_choice - 1]
+            batch_id, batch_number, current_quantity, current_buying, current_expiry, is_active, shipping_cost, handling_cost = batches[batch_choice - 1]
             
             # ✅ 2. GET CURRENT DATA WITH SELECTED BATCH
             current_data = self.product_service.get_current_product_data(
